@@ -35,12 +35,16 @@ end
 if configFile.show_ui == false then
   spoon.RecursiveBinder.showBindHelper = false
 end
+if configFile.rebind_rcmd == true then
+  CAPTURE_RCMD = true
+end
 -- clear settings from table so we don't have to account
 -- for them in the recursive processing function
 configFile.leader_key = nil
 configFile.auto_reload = nil
 configFile.toast_on_reload = nil
 configFile.show_ui = nil
+configFile.rebind_rcmd = nil
 
 hs.window.animationDuration = 0
 
@@ -149,4 +153,23 @@ local function parseKeyMap(config)
 end
 
 local keys = parseKeyMap(configFile)
-hs.hotkey.bind('', leader_key, spoon.RecursiveBinder.recursiveBind(keys))
+local start = spoon.RecursiveBinder.recursiveBind(keys)
+if CAPTURE_RCMD then
+  local previous_flags
+  local rcmd_mask = hs.eventtap.event.rawFlagMasks.deviceRightCommand
+  tap = hs.eventtap.new({ hs.eventtap.event.types.flagsChanged }, function(ev)
+    local currentFlags = ev:getRawEventData().CGEventData.flags
+    if currentFlags & rcmd_mask > 0 then
+      previous_flags = currentFlags
+      start()
+      return true, {}
+    elseif previous_flags and previous_flags & rcmd_mask > 0 then
+      previous_flags = currentFlags
+      return true, {}
+    end
+    return false
+  end
+  ):start()
+  hs.hotkey.bind('', leader_key, start)
+else
+end
