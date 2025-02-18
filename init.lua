@@ -64,7 +64,7 @@ local text = function(s)
   return function() hs.eventtap.keyStrokes(s) end
 end
 local exe = function(cmd)
-  return function() hs.execute(cmd) end
+  return function() hs.execute(cmd, true) end
 end
 local launch = function(app)
   return function() hs.application.launchOrFocus(app) end
