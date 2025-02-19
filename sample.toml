@@ -67,7 +67,8 @@ l = ["raycast://extensions/raycast/window-management/right-half", "right half"]
 c = ["raycast://extensions/raycast/window-management/center-half", "center half"]
 
 # this group is handy to copy over
-# to your main config for easy experimenting
+# to your main config for quick access 
+# to your config
 [h]
 label = "[hammerspoon]"
 d = ["https://www.hammerspoon.org/docs/index.html", "docs"]
