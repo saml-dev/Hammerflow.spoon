@@ -28,6 +28,7 @@ end
 local leader_key = configFile.leader_key or "f18"
 local leader_key_mods = configFile.leader_key_mods or ""
 if not configFile.auto_reload or configFile.auto_reload == true then
+  spoon.ReloadConfiguration.watch_paths = { hs.configdir, '/Users/samlewis/dev/dotfiles' }
   spoon.ReloadConfiguration:start()
 end
 if configFile.toast_on_reload == true then
@@ -66,6 +67,10 @@ end
 local exe = function(cmd)
   return function() hs.execute(cmd, true) end
 end
+local exeBg = function(cmd)
+  return function() os.execute(cmd .. " &") end
+end
+local code = function(arg) return exeBg("/usr/local/bin/code " .. arg) end
 local launch = function(app)
   return function() hs.application.launchOrFocus(app) end
 end
@@ -95,6 +100,15 @@ local windowLocations = {
   ["fullscreen"] = function() hs.window.focusedWindow():toggleFullScreen() end
 }
 
+local function startswith(s, prefix)
+  return s:sub(1, #prefix) == prefix
+end
+
+local function postfix(s)
+  --  return the string after the colon
+  return s:sub(s:find(":") + 1)
+end
+
 local function getActionAndLabel(s)
   if s:find("^http[s]?://") then
     return open(s), s:sub(5, 5) == "s" and s:sub(9) or s:sub(8)
@@ -105,20 +119,23 @@ local function getActionAndLabel(s)
     end, s
   elseif s:find("^raycast://") then
     return raycast(s), s
-  elseif s:sub(1, 3) == "hs:" then
-    return hs_run(s:sub(4)), s
-  elseif s:sub(1, 4) == "cmd:" then
-    return exe(s:sub(5)), s:sub(5)
-  elseif s:sub(1, 5) == "code:" then
-    return exe("code " .. s:sub(6)), "code " .. s:sub(6)
-  elseif s:sub(1, 5) == "text:" then
-    return text(s:sub(6)), s:sub(6)
-  elseif s:sub(1, 7) == "window:" then
-    local loc = s:sub(8)
+  elseif startswith(s, "hs:") then
+    return hs_run(postfix(s)), s
+  elseif startswith(s, "cmd:") then
+    local arg = postfix(s)
+    return exe(arg), arg
+  elseif startswith(s, "code:") then
+    local arg = postfix(s)
+    return code(arg), "code " .. arg
+  elseif startswith(s, "text:") then
+    local arg = postfix(s)
+    return text(arg), arg
+  elseif startswith(s, "window:") then
+    local loc = postfix(s)
     if windowLocations[loc] then
       return windowLocations[loc], s
     else
-      -- e.g. window:0,0,.5,1 for left half of screen
+      -- regex to parse e.g. 0,0,.5,1 for left half of screen
       local x, y, w, h = loc:match("^([%.%d]+),%s*([%.%d]+),%s*([%.%d]+),%s*([%.%d]+)$")
       if not x then
         hs.alert('Invalid window location: "' .. loc .. '"', nil, nil, 5)
