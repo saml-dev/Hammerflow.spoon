@@ -81,7 +81,6 @@ c = ["raycast://extensions/raycast/window-management/center-half", "center half"
 # for quick access to your config
 [h]
 label = "[hammerspoon]"
-d = ["https://www.hammerspoon.org/docs/index.html", "docs"]
 c = "code: ~/.hammerspoon"
 r = "reload" # reserved for reloading your hammerspoon config (helpful when auto_reload is false)
 
