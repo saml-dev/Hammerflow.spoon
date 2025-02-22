@@ -47,6 +47,15 @@ configFile.show_ui = nil
 
 hs.window.animationDuration = 0
 
+local function parseKeystroke(keystroke)
+  local parts = {}
+  for part in keystroke:gmatch("%S+") do
+    table.insert(parts, part)
+  end
+  local key = table.remove(parts) -- Last part is the key
+  return parts, key
+end
+
 -- aliases
 local singleKey = spoon.RecursiveBinder.singleKey
 local rect = hs.geometry.rect
@@ -54,23 +63,24 @@ local move = function(loc)
   return function() hs.window.focusedWindow():move(loc) end
 end
 local open = function(link)
-  return function() hs.execute(string.format("open %s", link)) end
+  return function() os.execute(string.format("open %s", link)) end
 end
 local raycast = function(link)
   -- raycast needs -g to keep current app as "active" for
   -- pasting from emoji picker and window management
-  return function() hs.execute(string.format("open -g %s", link)) end
+  return function() os.execute(string.format("open -g %s", link)) end
 end
 local text = function(s)
   return function() hs.eventtap.keyStrokes(s) end
 end
-local exe = function(cmd)
-  return function() hs.execute(cmd, true) end
+local keystroke = function(keystroke)
+  local mods, key = parseKeystroke(keystroke)
+  return function() hs.eventtap.keyStroke(mods, key) end
 end
-local exeBg = function(cmd)
+local cmd = function(cmd)
   return function() os.execute(cmd .. " &") end
 end
-local code = function(arg) return exeBg("/usr/local/bin/code " .. arg) end
+local code = function(arg) return cmd("/usr/local/bin/code " .. arg) end
 local launch = function(app)
   return function() hs.application.launchOrFocus(app) end
 end
@@ -100,6 +110,9 @@ local windowLocations = {
   ["fullscreen"] = function() hs.window.focusedWindow():toggleFullScreen() end
 }
 
+-- helper functions
+
+
 local function startswith(s, prefix)
   return s:sub(1, #prefix) == prefix
 end
@@ -123,7 +136,10 @@ local function getActionAndLabel(s)
     return hs_run(postfix(s)), s
   elseif startswith(s, "cmd:") then
     local arg = postfix(s)
-    return exe(arg), arg
+    return cmd(arg), arg
+  elseif startswith(s, "shortcut:") then
+    local arg = postfix(s)
+    return keystroke(arg), arg
   elseif startswith(s, "code:") then
     local arg = postfix(s)
     return code(arg), "code " .. arg
