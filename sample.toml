@@ -16,6 +16,7 @@ auto_reload = true        # optional, default true, reload when any file in this
 toast_on_reload =  false  # optional, default false, show a toast when the config is reloaded
 show_ui = true            # optional, default true, show the ui with your key maps
 
+
 # set a key to open an app
 t = "Terminal"
 
