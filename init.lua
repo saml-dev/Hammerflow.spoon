@@ -21,13 +21,13 @@ if not configFile then
   spoon.ReloadConfiguration:start()
   return
 end
-if not configFile.leader_key then
+if configFile.leader_key == nil or configFile.leader_key == "" then
   hs.alert("You must set leader_key at the top of " .. configFileName .. ". Exiting.", 5)
   return
 end
 local leader_key = configFile.leader_key or "f18"
 local leader_key_mods = configFile.leader_key_mods or ""
-if not configFile.auto_reload or configFile.auto_reload == true then
+if configFile.auto_reload == nil or configFile.auto_reload then
   spoon.ReloadConfiguration.watch_paths = { hs.configdir, '/Users/samlewis/dev/dotfiles' }
   spoon.ReloadConfiguration:start()
 end
@@ -130,7 +130,7 @@ local function getActionAndLabel(s)
       hs.reload()
       hs.console.clearConsole()
     end, s
-  elseif s:find("^raycast://") then
+  elseif startswith(s, "raycast://") then
     return raycast(s), s
   elseif startswith(s, "hs:") then
     return hs_run(postfix(s)), s
