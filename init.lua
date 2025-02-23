@@ -80,7 +80,7 @@ end
 local cmd = function(cmd)
   return function() os.execute(cmd .. " &") end
 end
-local code = function(arg) return cmd("/usr/local/bin/code " .. arg) end
+local code = function(arg) return cmd("open -a 'Visual Studio Code' " .. arg) end
 local launch = function(app)
   return function() hs.application.launchOrFocus(app) end
 end
