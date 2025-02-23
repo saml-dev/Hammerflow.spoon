@@ -1,4 +1,4 @@
-# Cool Name I haven't come up with yet
+# Hammerflow
 A global leader key for your mac that's easy to configure and fun to play with!
 
 ## Quick start

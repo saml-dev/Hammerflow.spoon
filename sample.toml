@@ -67,7 +67,7 @@ r = "reload"            # reserved for reloading your hammerspoon config (helpfu
 label = "[window]"
 h = "window:left-half"                    # use presets listed in the README
 c = "window:center-half"                  # use presets listed in the README
-l = ["window:.4,.3,.2,.4","small center"] # or use 4 percentages for x,y,width,height for custom placement - more details in README
+s = ["window:.4,.3,.2,.4","small center"] # or use 4 percentages for x,y,width,height for custom placement - more details in README
 
 
 # or use raycast for window management if you prefer
