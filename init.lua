@@ -32,7 +32,7 @@ if configFile.auto_reload == nil or configFile.auto_reload then
   spoon.ReloadConfiguration:start()
 end
 if configFile.toast_on_reload == true then
-  hs.alert('Reloaded config')
+  hs.alert('🔁 Reloaded config')
 end
 if configFile.show_ui == false then
   spoon.RecursiveBinder.showBindHelper = false
