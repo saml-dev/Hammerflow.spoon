@@ -5,7 +5,7 @@
 # lua prioritizes home.toml, then work.toml,
 # then falls back to this sample.toml. If you
 # want different profile names, you can add it
-# to the list on line 8 of init.lua. 
+# to the list on line 22 of init.lua. 
 #################################################
 
 # settings
