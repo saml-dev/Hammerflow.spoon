@@ -55,11 +55,11 @@ e = ["raycast://extensions/raycast/emoji-symbols/search-emoji-symbols", "emoji"]
 # use prefixes for special actions
 [p]
 label = "[prefixes]"
-t = "text:sam@saml.dev" # types "sam@saml.dev"
-z = "cmd:code ~/.zshrc" # run any terminal command
-x = "code: ~/.zshrc"    # code: is shorthand for cmd:code
-a = "shortcut:cmd a"    # trigger a keyboard shortcut
-r = "reload"            # reserved for reloading your hammerspoon config (helpful when auto_reload is false)
+t = "text:sam@saml.dev"       # types "sam@saml.dev"
+z = "cmd:code ~/.zshrc"       # run any terminal command
+x = "code: ~/.zshrc"          # code: is shorthand for cmd:code
+s = "shortcut:cmd shift 4"    # trigger a keyboard shortcut
+r = "reload"                  # reserved for reloading your hammerspoon config (helpful when auto_reload is false)
 
 
 # we have window management too!
