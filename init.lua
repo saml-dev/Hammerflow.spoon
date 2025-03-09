@@ -1,11 +1,28 @@
+local obj = {}
+obj.__index = obj
+
+-- Metadata
+obj.name = "Hammerflow"
+obj.version = "1.0"
+obj.author = "Sam Lewis <sam@saml.dev>"
+obj.homepage = "https://github.com/saml-dev/hammerflow"
+obj.license = "MIT - https://opensource.org/licenses/MIT"
+
+-- State
+obj.hotReload = false
+
+-- lets us package RecursiveBinder with Hammerflow to include
+-- sorting and a bug fix that hasn't been merged upstream yet
+-- https://github.com/Hammerspoon/Spoons/pull/333
+package.path = package.path .. ";" .. hs.configdir .. "/Spoons/Hammerflow.spoon/Spoons/?.spoon/init.lua"
 hs.loadSpoon("RecursiveBinder")
-hs.loadSpoon("ReloadConfiguration")
+
 local function full_path(rel_path)
   local current_file = debug.getinfo(2, "S").source:sub(2) -- Get the current file's path
   local current_dir = current_file:match("(.*/)") or "."   -- Extract the directory
   return current_dir .. rel_path
 end
-local function require_relative(path)
+local function loadfile_relative(path)
   local full_path = full_path(path)
   local f, err = loadfile(full_path)
   if f then
@@ -14,53 +31,8 @@ local function require_relative(path)
     error("Failed to require relative file: " .. full_path .. " - " .. err)
   end
 end
-local toml = require_relative("lib/tinytoml.lua")
 
--- Allows different configs for different computers.
--- Reads the first config found and falls back to sample.toml
--- so shortcuts work right after git clone for new users.
-local configs = { "home.toml", "work.toml", "sample.toml" }
-
-local configFile = nil
-local configFileName = ""
-for _, config in ipairs(configs) do
-  local fPath = full_path(config)
-  if pcall(function() toml.parse(fPath) end) then
-    configFile = toml.parse(fPath)
-    configFileName = config
-    break
-  end
-end
-if not configFile then
-  hs.alert("No toml config found! Searched for: " .. table.concat(configs, ', '), 5)
-  spoon.ReloadConfiguration:start()
-  return
-end
-if configFile.leader_key == nil or configFile.leader_key == "" then
-  hs.alert("You must set leader_key at the top of " .. configFileName .. ". Exiting.", 5)
-  return
-end
-local leader_key = configFile.leader_key or "f18"
-local leader_key_mods = configFile.leader_key_mods or ""
-if configFile.auto_reload == nil or configFile.auto_reload then
-  spoon.ReloadConfiguration.watch_paths = { hs.configdir, '/Users/samlewis/dev/dotfiles' }
-  spoon.ReloadConfiguration:start()
-end
-if configFile.toast_on_reload == true then
-  hs.alert('🔁 Reloaded config')
-end
-if configFile.show_ui == false then
-  spoon.RecursiveBinder.showBindHelper = false
-end
--- clear settings from table so we don't have to account
--- for them in the recursive processing function
-configFile.leader_key = nil
-configFile.leader_key_mods = nil
-configFile.auto_reload = nil
-configFile.toast_on_reload = nil
-configFile.show_ui = nil
-
-hs.window.animationDuration = 0
+local toml = loadfile_relative("lib/tinytoml.lua")
 
 local function parseKeystroke(keystroke)
   local parts = {}
@@ -71,7 +43,7 @@ local function parseKeystroke(keystroke)
   return parts, key
 end
 
--- aliases
+-- Action Helpers
 local singleKey = spoon.RecursiveBinder.singleKey
 local rect = hs.geometry.rect
 local move = function(loc)
@@ -126,8 +98,6 @@ local windowLocations = {
 }
 
 -- helper functions
-
-
 local function startswith(s, prefix)
   return s:sub(1, #prefix) == prefix
 end
@@ -197,23 +167,71 @@ local function getActionAndLabel(s)
   end
 end
 
-local function parseKeyMap(config)
-  local keyMap = {}
-  for k, v in pairs(config) do
-    if k == "label" then
-      -- continue
-    elseif type(v) == "string" then
-      local action, label = getActionAndLabel(v)
-      keyMap[singleKey(k, label)] = action
-    elseif type(v) == "table" and v[1] then
-      local action, _ = getActionAndLabel(v[1])
-      keyMap[singleKey(k, v[2])] = action
-    else
-      keyMap[singleKey(k, v.label or k)] = parseKeyMap(v)
+function obj.loadFirstValidTomlFile(paths)
+  -- parse TOML file
+  local configFile = nil
+  local configFileName = ""
+  for _, path in ipairs(paths) do
+    if not startswith(path, "/") then
+      path = hs.configdir .. "/" .. path
+    end
+    if pcall(function() toml.parse(path) end) then
+      configFile = toml.parse(path)
+      configFileName = path
+      break
     end
   end
-  return keyMap
+  if not configFile then
+    hs.alert("No toml config found! Searched for: " .. table.concat(paths, ', '), 5)
+    obj.hotReload = true
+    return
+  end
+  if configFile.leader_key == nil or configFile.leader_key == "" then
+    hs.alert("You must set leader_key at the top of " .. configFileName .. ". Exiting.", 5)
+    return
+  end
+
+  -- settings
+  local leader_key = configFile.leader_key or "f18"
+  local leader_key_mods = configFile.leader_key_mods or ""
+  if configFile.auto_reload == nil or configFile.auto_reload then
+    obj.hotReload = true
+  end
+  if configFile.toast_on_reload == true then
+    hs.alert('🔁 Reloaded config')
+  end
+  if configFile.show_ui == false then
+    spoon.RecursiveBinder.showBindHelper = false
+  end
+
+  -- clear settings from table so we don't have to account
+  -- for them in the recursive processing function
+  configFile.leader_key = nil
+  configFile.leader_key_mods = nil
+  configFile.auto_reload = nil
+  configFile.toast_on_reload = nil
+  configFile.show_ui = nil
+
+  local function parseKeyMap(config)
+    local keyMap = {}
+    for k, v in pairs(config) do
+      if k == "label" then
+        -- continue
+      elseif type(v) == "string" then
+        local action, label = getActionAndLabel(v)
+        keyMap[singleKey(k, label)] = action
+      elseif type(v) == "table" and v[1] then
+        local action, _ = getActionAndLabel(v[1])
+        keyMap[singleKey(k, v[2])] = action
+      else
+        keyMap[singleKey(k, v.label or k)] = parseKeyMap(v)
+      end
+    end
+    return keyMap
+  end
+
+  local keys = parseKeyMap(configFile)
+  hs.hotkey.bind(leader_key_mods, leader_key, spoon.RecursiveBinder.recursiveBind(keys))
 end
 
-local keys = parseKeyMap(configFile)
-hs.hotkey.bind(leader_key_mods, leader_key, spoon.RecursiveBinder.recursiveBind(keys))
+return obj

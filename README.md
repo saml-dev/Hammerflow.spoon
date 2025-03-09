@@ -1,11 +1,10 @@
 # Hammerflow
-A global leader key for your mac that's easy to configure and fun to play with!
+A Hammerspoon Spoon to enable a global leader key for your mac that's easy to configure and fun to play with!
 
 ## Quick start
-1. Clone this repo to the default Hammerspoon config location
+1. Clone this repo to your spoons directory
 ```bash
-git clone https://github.com/saml-dev/hammerspoon-config ~/.hammerspoon
+git clone https://github.com/saml-dev/hammerflow ~/.hammerspoon/Spoons/Hammerflow.spoon
 ```
-2. Install [Hammerspoon](https://www.hammerspoon.org/)
-3. Explore `sample.toml` to see what you can do and try out some of the default actions.
-4. Create `home.toml` or `work.toml` and personalize to your hearts content!
+1. Explore `sample.toml` to see what you can do and try out some of the default actions.
+1. Create `home.toml` or `work.toml` in your Hammerspoon config directory and personalize to your hearts content!
