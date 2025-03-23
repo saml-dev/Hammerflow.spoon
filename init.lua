@@ -257,9 +257,19 @@ function obj.loadFirstValidTomlFile(paths)
 
   local function parseKeyMap(config)
     local keyMap = {}
+    local appSpecificActions = nil
     for k, v in pairs(config) do
       if k == "label" then
         -- continue
+      elseif string.find(k, ":") then
+        local key = k:sub(1, 1)
+        local app = k:sub(3)
+        if appSpecificActions == nil then appSpecificActions = {} end
+        if appSpecificActions[key] then
+          appSpecificActions[key][app] = v
+        else
+          appSpecificActions[key] = { [app] = getActionAndLabel(v) }
+        end
       elseif type(v) == "string" then
         local action, label = getActionAndLabel(v)
         keyMap[singleKey(k, label)] = action
@@ -270,6 +280,28 @@ function obj.loadFirstValidTomlFile(paths)
         keyMap[singleKey(k, v.label or k)] = parseKeyMap(v)
       end
     end
+    if appSpecificActions ~= nil then
+      -- find the default action if it exists
+      for key_, value_ in pairs(keyMap) do
+        if appSpecificActions[key_[2]] then
+          appSpecificActions[key_[2]]["_"] = value_
+          keyMap[key_] = nil
+        end
+      end
+      -- add appSpecificActions to keyMap
+      for key_, value_ in pairs(appSpecificActions) do
+        keyMap[singleKey(key_, "multi")] = function()
+          local app = hs.application.frontmostApplication():title()
+          if value_[app] then
+            value_[app]()
+          elseif value_["_"] then
+            value_["_"]()
+          end
+        end
+      end
+    end
+
+
     return keyMap
   end
 
