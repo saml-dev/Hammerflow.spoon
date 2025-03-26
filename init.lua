@@ -261,7 +261,7 @@ function obj.loadFirstValidTomlFile(paths)
     for k, v in pairs(config) do
       if k == "label" then
         -- continue
-      elseif string.find(k, ":") then
+      elseif string.find(k, "_") then
         local key = k:sub(1, 1)
         local app = k:sub(3)
         if appSpecificActions == nil then appSpecificActions = {} end
