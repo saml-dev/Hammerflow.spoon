@@ -266,7 +266,7 @@ function obj.loadFirstValidTomlFile(paths)
         local app = k:sub(3)
         if appSpecificActions == nil then appSpecificActions = {} end
         if appSpecificActions[key] then
-          appSpecificActions[key][app] = v
+          appSpecificActions[key][app] = getActionAndLabel(v)
         else
           appSpecificActions[key] = { [app] = getActionAndLabel(v) }
         end
