@@ -7,7 +7,7 @@ obj.__index = obj
 obj.name = "Hammerflow"
 obj.version = "1.0"
 obj.author = "Sam Lewis <sam@saml.dev>"
-obj.homepage = "https://github.com/saml-dev/hammerflow"
+obj.homepage = "https://github.com/saml-dev/Hammerflow.spoon"
 obj.license = "MIT - https://opensource.org/licenses/MIT"
 
 -- State
@@ -34,6 +34,16 @@ local function loadfile_relative(path)
   else
     error("Failed to require relative file: " .. full_path .. " - " .. err)
   end
+end
+local function split(inputstr, sep)
+  if sep == nil then
+    sep = "%s"
+  end
+  local t = {}
+  for str in string.gmatch(inputstr, "([^" .. sep .. "]+)") do
+    table.insert(t, str)
+  end
+  return t
 end
 
 local toml = loadfile_relative("lib/tinytoml.lua")
@@ -101,11 +111,18 @@ local hs_run = function(lua)
   return function() load(lua)() end
 end
 local userFunc = function(funcKey)
+  local args = nil
+  -- if funcKey has | in it, split on it. first is function name, rest are args for that function
+  if funcKey:find("|") then
+    local sp = split(funcKey, "|")
+    funcKey = table.remove(sp, 1)
+    args = sp
+  end
   return function()
     if obj._userFunctions[funcKey] then
-      obj._userFunctions[funcKey]()
+      obj._userFunctions[funcKey](table.unpack(args or {}))
     else
-      hs.alert("Unknown function " .. funcKey, 5)
+      hs.alert("Unknown function " .. funcKey, 3)
     end
   end
 end
