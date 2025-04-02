@@ -345,7 +345,7 @@ function obj.loadFirstValidTomlFile(paths)
   hs.hotkey.bind(leader_key_mods, leader_key, spoon.RecursiveBinder.recursiveBind(keys))
 end
 
-obj.registerFunctions = function(...)
+function obj.registerFunctions(...)
   for _, funcs in pairs({ ... }) do
     for k, v in pairs(funcs) do
       obj._userFunctions[k] = v
