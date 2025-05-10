@@ -273,9 +273,8 @@ function obj.loadFirstValidTomlFile(paths)
   if configFile.show_ui == false then
     spoon.RecursiveBinder.showBindHelper = false
   end
-  if configFile.use_default_alert_style == true then
-    spoon.RecursiveBinder.helperFormat = hs.alert.defaultStyle
-  end
+
+  spoon.RecursiveBinder.helperFormat = hs.alert.defaultStyle
 
   -- clear settings from table so we don't have to account
   -- for them in the recursive processing function
@@ -284,7 +283,6 @@ function obj.loadFirstValidTomlFile(paths)
   configFile.auto_reload = nil
   configFile.toast_on_reload = nil
   configFile.show_ui = nil
-  configFile.use_default_alert_style = nil
 
   local function parseKeyMap(config)
     local keyMap = {}

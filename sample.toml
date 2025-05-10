@@ -15,7 +15,6 @@ leader_key_mods = ""      # optional, default "", not recommended - a dedicated 
 auto_reload = true        # optional, default true, reload when any file in this directory is saved
 toast_on_reload = true    # optional, default false, show a toast when the config is reloaded
 show_ui = true            # optional, default true, show the ui with your key maps
-use_default_alert_style = true # optional, default false, use hammerspoon default alert style
 
 
 # set a key to open an app
