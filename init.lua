@@ -22,8 +22,7 @@ package.path = package.path .. ";" .. hs.configdir .. "/Spoons/Hammerflow.spoon/
 hs.loadSpoon("RecursiveBinder")
 
 local function full_path(rel_path)
-  local current_file = debug.getinfo(2, "S").source:sub(2) -- Get the current file's path
-  local current_dir = current_file:match("(.*/)") or "."   -- Extract the directory
+  local current_dir = hs.spoons.scriptPath()   -- Extract the directory
   return current_dir .. rel_path
 end
 local function loadfile_relative(path)
