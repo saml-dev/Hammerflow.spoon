@@ -64,11 +64,19 @@ i = "input:https://google.com/search?q={input}" # capture input and insert it in
 
 
 # we have window management too!
+# [w]
+# label = "[workspace]"
+# # z = "cmd:nvim ~/.zshrc"       # run any terminal command
+# 1 = ["function:aero|1"]
+# 2 = ["function:aero|2"]
+
 [w]
-label = "[window]"
-h = "window:left-half"                    # use presets listed in the README
-c = "window:center-half"                  # use presets listed in the README
-s = ["window:.4,.3,.2,.4","small center"] # or use 4 percentages for x,y,width,height for custom placement - more details in README
+label = "Window Ops"
+"__HAMMERFLOW_WILDCARD_ACTION__" = ["function:aero|{KEY}"] # {KEY} will be replaced by the actual key pressed
+
+# h = "window:left-half"                    # use presets listed in the README
+# c = "window:center-half"                  # use presets listed in the README
+# s = ["window:.4,.3,.2,.4","small center"] # or use 4 percentages for x,y,width,height for custom placement - more details in README
 
 
 # or use raycast for window management if you prefer
