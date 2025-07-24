@@ -93,6 +93,9 @@ local raycast = function(link)
   -- pasting from emoji picker and window management
   return function() os.execute(string.format("open -g %s", link)) end
 end
+local things = function(link)
+  return function() os.execute(string.format("open %s", link)) end
+end
 local text = function(s)
   return function() hs.eventtap.keyStrokes(s) end
 end
@@ -178,6 +181,8 @@ local function getActionAndLabel(s)
     end, s
   elseif startswith(s, "raycast://") then
     return raycast(s), s
+  elseif startswith(s, "things:///") then
+    return things(s), s
   elseif startswith(s, "hs:") then
     return hs_run(postfix(s)), s
   elseif startswith(s, "cmd:") then
