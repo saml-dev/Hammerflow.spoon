@@ -183,7 +183,7 @@ local function getActionAndLabel(s)
       hs.console.clearConsole()
     end, s
   elseif startswith(s, "alfred://") then
-    return things(s), s
+    return alfred(s), s
   elseif startswith(s, "raycast://") then
     return raycast(s), s
   elseif startswith(s, "things:///") then
