@@ -88,6 +88,9 @@ end
 local open = function(link)
   return function() os.execute(string.format("open \"%s\"", link)) end
 end
+local alfred = function(link)
+  return function() os.execute(string.format("open %s", link)) end
+end
 local raycast = function(link)
   -- raycast needs -g to keep current app as "active" for
   -- pasting from emoji picker and window management
@@ -179,6 +182,8 @@ local function getActionAndLabel(s)
       hs.reload()
       hs.console.clearConsole()
     end, s
+  elseif startswith(s, "alfred://") then
+    return things(s), s
   elseif startswith(s, "raycast://") then
     return raycast(s), s
   elseif startswith(s, "things:///") then
