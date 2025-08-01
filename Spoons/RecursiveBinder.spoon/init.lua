@@ -5,7 +5,7 @@
 ---
 --- [Click to download](https://github.com/Hammerspoon/Spoons/raw/master/Spoons/RecursiveBinder.spoon.zip)
 
-local obj={}
+local obj = {}
 obj.__index = obj
 
 
@@ -20,7 +20,7 @@ obj.license = "MIT - https://opensource.org/licenses/MIT"
 --- RecursiveBinder.escapeKey
 --- Variable
 --- key to abort, default to {keyNone, 'escape'}
-obj.escapeKey = {keyNone, 'escape'}
+obj.escapeKey = { keyNone, 'escape' }
 
 --- RecursiveBinder.helperEntryEachLine
 --- Variable
@@ -35,14 +35,18 @@ obj.helperEntryLengthInChar = 20
 --- RecursiveBinder.helperFormat
 --- Variable
 --- format of helper, the helper is just a hs.alert
---- default to {atScreenEdge=2,
+---
+--- Notes:
+---  * default to {atScreenEdge=2,
 ---             strokeColor={ white = 0, alpha = 2 },
 ---             textFont='SF Mono'
 ---             textSize=20}
-obj.helperFormat = {atScreenEdge=2,
-                    strokeColor={ white = 0, alpha = 2 },
-                    textFont='Courier',
-                    textSize=20}
+obj.helperFormat = {
+   atScreenEdge = 2,
+   strokeColor = { white = 0, alpha = 2 },
+   textFont = 'Courier',
+   textSize = 20
+}
 
 --- RecursiveBinder.showBindHelper()
 --- Variable
@@ -52,7 +56,9 @@ obj.showBindHelper = true
 --- RecursiveBinder.helperModifierMapping()
 --- Variable
 --- The mapping used to display modifiers on helper.
---- Default to {
+---
+--- Notes:
+---  * Default to {
 ---  command = '⌘',
 ---  control = '⌃',
 ---  option = '⌥',
@@ -68,59 +74,59 @@ obj.helperModifierMapping = {
 -- used by next model to close previous helper
 local previousHelperID = nil
 
--- this function is used by helper to display 
+-- this function is used by helper to display
 -- appropriate 'shift + key' bindings
 -- it turns a lower key to the corresponding
 -- upper key on keyboard
 local function keyboardUpper(key)
    local upperTable = {
-    a='A', 
-    b='B', 
-    c='C', 
-    d='D', 
-    e='E', 
-    f='F', 
-    g='G', 
-    h='H', 
-    i='I', 
-    j='J', 
-    k='K', 
-    l='L', 
-    m='M', 
-    n='N', 
-    o='O', 
-    p='P', 
-    q='Q', 
-    r='R', 
-    s='S', 
-    t='T', 
-    u='U', 
-    v='V', 
-    w='W', 
-    x='X', 
-    y='Y', 
-    z='Z', 
-    ['`']='~',
-    ['1']='!',
-    ['2']='@',
-    ['3']='#',
-    ['4']='$',
-    ['5']='%',
-    ['6']='^',
-    ['7']='&',
-    ['8']='*',
-    ['9']='(',
-    ['0']=')',
-    ['-']='_',
-    ['=']='+',
-    ['[']='}',
-    [']']='}',
-    ['\\']='|',
-    [';']=':',
-    ['\'']='"',
-    [',']='<',
-    ['.']='>',
-    ['/']='?'
+      a = 'A',
+      b = 'B',
+      c = 'C',
+      d = 'D',
+      e = 'E',
+      f = 'F',
+      g = 'G',
+      h = 'H',
+      i = 'I',
+      j = 'J',
+      k = 'K',
+      l = 'L',
+      m = 'M',
+      n = 'N',
+      o = 'O',
+      p = 'P',
+      q = 'Q',
+      r = 'R',
+      s = 'S',
+      t = 'T',
+      u = 'U',
+      v = 'V',
+      w = 'W',
+      x = 'X',
+      y = 'Y',
+      z = 'Z',
+      ['`'] = '~',
+      ['1'] = '!',
+      ['2'] = '@',
+      ['3'] = '#',
+      ['4'] = '$',
+      ['5'] = '%',
+      ['6'] = '^',
+      ['7'] = '&',
+      ['8'] = '*',
+      ['9'] = '(',
+      ['0'] = ')',
+      ['-'] = '_',
+      ['='] = '+',
+      ['['] = '}',
+      [']'] = '}',
+      ['\\'] = '|',
+      [';'] = ':',
+      ['\''] = '"',
+      [','] = '<',
+      ['.'] = '>',
+      ['/'] = '?'
    }
    uppperKey = upperTable[key]
    if uppperKey then
@@ -144,17 +150,16 @@ end
 function obj.singleKey(key, name)
    local mod = {}
    if key == keyboardUpper(key) and string.len(key) == 1 then
-      mod = {'shift'}
+      mod = { 'shift' }
       key = string.lower(key)
    end
 
    if name then
-      return {mod, key, name}
+      return { mod, key, name }
    else
-      return {mod, key, 'no name'}
+      return { mod, key, 'no name' }
    end
 end
-
 
 -- generate a string representation of a key spec
 -- {{'shift', 'command'}, 'a} -> 'shift+command+a'
@@ -177,14 +182,14 @@ local function createKeyName(key)
          for count = 1, #modifierTable do
             local modifier = modifierTable[count]
             if count == 1 then
-               keyName = obj.helperModifierMapping[modifier]..' + '
-            else 
-               keyName = keyName..obj.helperModifierMapping[modifier]..' + '
+               keyName = obj.helperModifierMapping[modifier] .. ' + '
+            else
+               keyName = keyName .. obj.helperModifierMapping[modifier] .. ' + '
             end
          end
       end
       -- finally append key, e.g. 'f', after modifers
-      return keyName..keyString
+      return keyName .. keyString
    end
 end
 
@@ -196,10 +201,10 @@ local function compareLetters(a, b)
    local asciiA = string.byte(a)
    local asciiB = string.byte(b)
    if asciiA >= 65 and asciiA <= 90 then
-       asciiA = asciiA + 32.5
+      asciiA = asciiA + 32.5
    end
    if asciiB >= 65 and asciiB <= 90 then
-       asciiB = asciiB + 32.5
+      asciiB = asciiB + 32.5
    end
    return asciiA < asciiB
 end
@@ -208,38 +213,38 @@ end
 local function showHelper(keyFuncNameTable)
    -- keyFuncNameTable is a table that key is key name and value is description
    local helper = ''
-   local separator = '' -- first loop doesn't need to add a separator, because it is in the very front. 
+   local separator = '' -- first loop doesn't need to add a separator, because it is in the very front.
    local lastLine = ''
    local count = 0
 
    local sortedKeyFuncNameTable = {}
    for keyName, funcName in pairs(keyFuncNameTable) do
-       table.insert(sortedKeyFuncNameTable, {keyName = keyName, funcName = funcName})
+      table.insert(sortedKeyFuncNameTable, { keyName = keyName, funcName = funcName })
    end
    table.sort(sortedKeyFuncNameTable, function(a, b) return compareLetters(a.keyName, b.keyName) end)
+   print(hs.inspect(sortedKeyFuncNameTable))
 
    for _, value in ipairs(sortedKeyFuncNameTable) do
       local keyName = value.keyName
       local funcName = value.funcName
-      count = count + 1
-      local newEntry = keyName..' → '..funcName
+      local newEntry = keyName .. ' → ' .. funcName
       -- make sure each entry is of the same length
       if string.len(newEntry) > obj.helperEntryLengthInChar then
-         newEntry = string.sub(newEntry, 1, obj.helperEntryLengthInChar - 2)..'..'
+         newEntry = string.sub(newEntry, 1, obj.helperEntryLengthInChar - 2) .. '..'
       elseif string.len(newEntry) < obj.helperEntryLengthInChar then
-         newEntry = newEntry..string.rep(' ', obj.helperEntryLengthInChar - string.len(newEntry))
+         newEntry = newEntry .. string.rep(' ', obj.helperEntryLengthInChar - string.len(newEntry))
       end
       -- create new line for every helperEntryEachLine entries
-      if count % (obj.helperEntryEachLine + 1) == 0 then
-         separator = '\n '
-      elseif count == 1 then
-         separator = ' '
+      if count == 0 then
+         separator = ''
+      elseif count % obj.helperEntryEachLine == 0 then
+         separator = '\n'
       else
          separator = '  '
       end
-      helper = helper..separator..newEntry
+      helper = helper .. separator .. newEntry
+      count = count + 1
    end
-   helper = string.match(helper, '[^\n].+$')
    previousHelperID = hs.alert.show(helper, obj.helperFormat, true)
 end
 
@@ -257,15 +262,14 @@ end
 --- Returns:
 ---  * A function to start. Bind it to a initial key binding.
 ---
---- Note:
---- Spec of keymap:
---- Every key is of format {{modifers}, key, (optional) description}
---- The first two element is what you usually pass into a hs.hotkey.bind() function.
---- 
---- Each value of key can be in two form:
---- 1. A function. Then pressing the key invokes the function
---- 2. A table. Then pressing the key bring to another layer of keybindings.
----    And the table have the same format of top table: keys to keys, value to table or function
+--- Notes:
+---  * Spec of keymap:
+---   * Every key is of format {{modifers}, key, (optional) description}
+---   * The first two element is what you usually pass into a hs.hotkey.bind() function.
+---   * Each value of key can be in two form:
+---      1. A function. Then pressing the key invokes the function
+---      2. A table. Then pressing the key bring to another layer of keybindings.
+---      And the table have the same format of top table: keys to keys, value to table or function
 
 -- the actual binding function
 function obj.recursiveBind(keymap, modals)
@@ -279,17 +283,25 @@ function obj.recursiveBind(keymap, modals)
    local keyFuncNameTable = {}
    for key, map in pairs(keymap) do
       local func = obj.recursiveBind(map, modals)
-      -- key[1] is modifiers, i.e. {'shift'}, key[2] is key, i.e. 'f' 
-      modal:bind(key[1], key[2], function() modal:exit() killHelper() func() end)
-      modal:bind(obj.escapeKey[1], obj.escapeKey[2], function() modal:exit() killHelper() end)
+      -- key[1] is modifiers, i.e. {'shift'}, key[2] is key, i.e. 'f'
+      modal:bind(key[1], key[2], function()
+         modal:exit()
+         killHelper()
+         func()
+      end)
+      modal:bind(obj.escapeKey[1], obj.escapeKey[2], function()
+         modal:exit()
+         killHelper()
+      end)
       if #key >= 3 then
          keyFuncNameTable[createKeyName(key)] = key[3]
       end
    end
    return function()
-      -- exit all modals, accounts for pressing the leader key while in a modal
-      for _, m in ipairs(modals) do
-         m:exit()
+      -- exit all modals, accounts for pressing the trigger key while
+      -- a modal is already open
+      for _, modal in pairs(modals) do
+         modal:exit()
       end
       modal:enter()
       killHelper()
@@ -298,7 +310,6 @@ function obj.recursiveBind(keymap, modals)
       end
    end
 end
-
 
 -- function testrecursiveModal(keymap)
 --    print(keymap)

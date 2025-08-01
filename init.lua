@@ -14,6 +14,7 @@ obj.license = "MIT - https://opensource.org/licenses/MIT"
 obj.auto_reload = false
 obj._userFunctions = {}
 obj._apps = {}
+obj._ui_format = nil
 
 -- lets us package RecursiveBinder with Hammerflow to include
 -- sorting and a bug fix that hasn't been merged upstream yet
@@ -283,8 +284,11 @@ function obj.loadFirstValidTomlFile(paths)
   if configFile.show_ui == false then
     spoon.RecursiveBinder.showBindHelper = false
   end
+  if configFile.key_maps_per_line ~= nil then
+    spoon.RecursiveBinder.helperEntryEachLine = configFile.key_maps_per_line
+  end
 
-  spoon.RecursiveBinder.helperFormat = hs.alert.defaultStyle
+  spoon.RecursiveBinder.helperFormat = obj._ui_format or hs.alert.defaultStyle
 
   -- clear settings from table so we don't have to account
   -- for them in the recursive processing function
@@ -293,6 +297,7 @@ function obj.loadFirstValidTomlFile(paths)
   configFile.auto_reload = nil
   configFile.toast_on_reload = nil
   configFile.show_ui = nil
+  configFile.key_maps_per_line = nil
 
   local function parseKeyMap(config)
     local keyMap = {}
@@ -379,6 +384,19 @@ function obj.registerFunctions(...)
       obj._userFunctions[k] = v
     end
   end
+end
+
+--- Register UI formatting using standard Hammerspoon syntax (see documentation links below).
+---
+--- NOTE: this must be called before Hammerflow.loadFirstValidTomlFile().
+---
+--- Alert Default Styling Docs: https://www.hammerspoon.org/docs/hs.alert.html#defaultStyle
+--- Text Styling Docs: https://www.hammerspoon.org/docs/hs.styledtext.html
+--- Color Styling Docs: https://www.hammerspoon.org/docs/hs.drawing.color.html
+---
+---@param opts table UI formatting options
+function obj.registerFormat(opts)
+  obj._ui_format = opts or {}
 end
 
 return obj
