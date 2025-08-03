@@ -63,7 +63,7 @@ spoon.Hammerflow.registerFormat({
 		shadow = { offset = { h = -1, w = 1 }, blurRadius = 10, color = { alpha = .50, white = 0 } }
 	},
 	strokeWidth = 6,
-	textFont = "JetBrainsMono NFM Bold",
+	textFont = "Monaco",
 	textSize = 18,
 })
 spoon.Hammerflow.loadFirstValidTomlFile({
