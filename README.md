@@ -40,6 +40,39 @@ end
 4. Explore sample.toml to see what you can do and try out some of the default actions.
 5. Create your own toml config and personalize to your hearts content!
 
+## UI Formatting
+
+Customize the format of your Hammerflow UI using standard Hammerspoon formatting syntax and separate from.
+
+> [!IMPORTANT]
+> Any formatting must be registered before loading your toml configuration.
+
+```lua
+hs.loadSpoon("Hammerflow")
+-- optionally set ui format (must be done before loading toml config)
+-- 🧛 Dracula inspired theme
+spoon.Hammerflow.registerFormat({
+	atScreenEdge = 2,
+	fillColor = { alpha = .875, hex = "282b36" },
+	padding = 18,
+	radius = 12,
+	strokeColor = { alpha = .875, hex = "f1fa8b" },
+	textColor = { alpha = 1, hex = "bd93f9" },
+	textStyle = {
+		paragraphStyle = { lineSpacing = 6 },
+		shadow = { offset = { h = -1, w = 1 }, blurRadius = 10, color = { alpha = .50, white = 0 } }
+	},
+	strokeWidth = 6,
+	textFont = "JetBrainsMono NFM Bold",
+	textSize = 18,
+})
+spoon.Hammerflow.loadFirstValidTomlFile({
+	"home.toml",
+	"work.toml",
+	"Spoons/Hammerflow.spoon/sample.toml",
+})
+```
+
 ## Full Documentation
 All available options are demonstrated in [sample.toml](./sample.toml). I will create proper documentation soon.
 
