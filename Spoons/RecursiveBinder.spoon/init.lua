@@ -222,7 +222,6 @@ local function showHelper(keyFuncNameTable)
       table.insert(sortedKeyFuncNameTable, { keyName = keyName, funcName = funcName })
    end
    table.sort(sortedKeyFuncNameTable, function(a, b) return compareLetters(a.keyName, b.keyName) end)
-   print(hs.inspect(sortedKeyFuncNameTable))
 
    for _, value in ipairs(sortedKeyFuncNameTable) do
       local keyName = value.keyName
