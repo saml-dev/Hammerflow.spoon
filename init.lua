@@ -117,6 +117,24 @@ end
 local hs_run = function(lua)
   return function() load(lua)() end
 end
+local menuAction = function(appName, menuPath, label)
+  return function()
+    local app
+    if appName and #appName > 0 then
+      app = hs.appfinder.appFromName(appName) or hs.application.get(appName)
+    else
+      app = hs.application.frontmostApplication()
+    end
+    if not app then
+      hs.alert("App not found: " .. (appName or "frontmost"), 3)
+      return
+    end
+    local ok = app:selectMenuItem(menuPath, true)
+    if not ok then
+      hs.alert("Menu not found: " .. label, 3)
+    end
+  end
+end
 local userFunc = function(funcKey)
   local args = nil
   -- if funcKey has | in it, split on it. first is function name, rest are args for that function
@@ -170,6 +188,10 @@ local function startswith(s, prefix)
   return s:sub(1, #prefix) == prefix
 end
 
+local function trim(s)
+  return (s:gsub("^%s+", ""):gsub("%s+$", ""))
+end
+
 local function postfix(s)
   --  return the string after the colon
   return s:sub(s:find(":") + 1)
@@ -191,6 +213,21 @@ local function getActionAndLabel(s)
     return things(s), s
   elseif startswith(s, "hs:") then
     return hs_run(postfix(s)), s
+  elseif startswith(s, "menu:") then
+    local arg = postfix(s)
+    local appName = nil
+    local pathStr = arg
+    if arg:find("|") then
+      local sp = split(arg, "|")
+      appName = trim(sp[1])
+      pathStr = trim(sp[2] or "")
+    end
+    local menuPath = split(pathStr, ">")
+    for i = 1, #menuPath do
+      menuPath[i] = trim(menuPath[i])
+    end
+    local label = (appName and (appName .. " | ") or "") .. table.concat(menuPath, " > ")
+    return menuAction(appName, menuPath, label), label
   elseif startswith(s, "cmd:") then
     local arg = postfix(s)
     return cmd(arg), arg
