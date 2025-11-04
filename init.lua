@@ -22,18 +22,13 @@ obj._ui_format = nil
 package.path = package.path .. ";" .. hs.configdir .. "/Spoons/Hammerflow.spoon/Spoons/?.spoon/init.lua"
 hs.loadSpoon("RecursiveBinder")
 
-local function full_path(rel_path)
-  local current_file = debug.getinfo(2, "S").source:sub(2) -- Get the current file's path
-  local current_dir = current_file:match("(.*/)") or "."   -- Extract the directory
-  return current_dir .. rel_path
-end
 local function loadfile_relative(path)
-  local full_path = full_path(path)
+  local full_path = hs.spoons.scriptPath() .. "/" .. path
   local f, err = loadfile(full_path)
   if f then
     return f()
   else
-    error("Failed to require relative file: " .. full_path .. " - " .. err)
+    error("Failed to load file: " .. full_path .. " - " .. err)
   end
 end
 local function split(inputstr, sep)
