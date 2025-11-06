@@ -22,6 +22,41 @@ obj._ui_format = nil
 package.path = package.path .. ";" .. hs.configdir .. "/Spoons/Hammerflow.spoon/Spoons/?.spoon/init.lua"
 hs.loadSpoon("RecursiveBinder")
 
+-- Global function that safely calls the given function and
+-- returns nil if it errors.
+local function SafeCall(func)
+  local status, result = pcall(func)
+  if status then
+    return result
+  else
+    return nil
+  end
+end
+
+-- Global function that turns a string into a Mac app as reliably as possible.
+-- It's basically hs.application.find but it also uses the path as a possible
+-- match. VS Code is an example where the name is "Code" but the path is
+-- "/Applications/Visual Studio Code.app".
+function FindApp(searchTerm)
+  local running = hs.application.runningApplications()
+  for _, a in ipairs(running) do
+    if a:kind() < 0 then goto continue end
+    local name = SafeCall(function() return a:name():lower() end)
+    if not name then goto continue end
+    local path = SafeCall(function() return a:path():lower() end)
+    if not path then goto continue end
+    local bundleID = SafeCall(function() return a:bundleID():lower() end)
+    if not bundleID then goto continue end
+    if name == searchTerm:lower()
+        or bundleID == searchTerm:lower()
+        or path == '/applications/' .. searchTerm:lower() .. '.app' then
+      return a
+    end
+    ::continue::
+  end
+  return app
+end
+
 local function loadfile_relative(path)
   local full_path = hs.spoons.scriptPath() .. "/" .. path
   local f, err = loadfile(full_path)
@@ -74,8 +109,8 @@ local move = function(loc)
     -- animate when no other apps do, and only change size *or*
     -- position when moved, so it has to be issued twice. 0.2 is
     -- the shortest delay that works consistently.
-    if hs.application.frontmostApplication():bundleID() == "app.zen-browser.zen" or
-        hs.application.frontmostApplication():bundleID() == "org.mozilla.firefox" then
+    local bid = hs.application.frontmostApplication():bundleID()
+    if bid == "app.zen-browser.zen" or bid == "org.mozilla.firefox" then
       os.execute("sleep 0.2")
       w:move(loc)
     end
@@ -116,7 +151,7 @@ local menuAction = function(appName, menuPath, label)
   return function()
     local app
     if appName and #appName > 0 then
-      app = hs.appfinder.appFromName(appName) or hs.application.get(appName)
+      app = FindApp(appName)
     else
       app = hs.application.frontmostApplication()
     end
@@ -148,11 +183,10 @@ local userFunc = function(funcKey)
 end
 local function isApp(app)
   return function()
+    local foundApp = FindApp(app)
+    if not foundApp then return false end
     local frontApp = hs.application.frontmostApplication()
-    local title = frontApp:title():lower()
-    local bundleID = frontApp:bundleID():lower()
-    app = app:lower()
-    return title == app or bundleID == app
+    return foundApp:bundleID() == frontApp:bundleID()
   end
 end
 
