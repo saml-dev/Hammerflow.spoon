@@ -414,6 +414,9 @@ function obj.loadFirstValidTomlFile(paths)
       for key_, value_ in pairs(conditionalActions) do
         keyMap[singleKey(key_, conditionalLabels[key_] or "conditional")] = function()
           for cond, fn in pairs(value_) do
+            -- skip default action, it is the last resort, after the loop
+            if cond == "_" then goto continue end
+
             -- check user functions first
             if obj._userFunctions[cond] then
               if obj._userFunctions[cond]() then
@@ -428,6 +431,8 @@ function obj.loadFirstValidTomlFile(paths)
               fn()
               return
             end
+
+            ::continue::
           end
 
           -- if no conditions matched, run default action if it exists
