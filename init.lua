@@ -413,17 +413,25 @@ function obj.loadFirstValidTomlFile(paths)
       -- add conditionalActions to keyMap
       for key_, value_ in pairs(conditionalActions) do
         keyMap[singleKey(key_, conditionalLabels[key_] or "conditional")] = function()
-          local fallback = true
           for cond, fn in pairs(value_) do
-            if (obj._userFunctions[cond] and obj._userFunctions[cond]())
-                or (obj._userFunctions[cond] == nil and isApp(cond)())
-            then
+            -- check user functions first
+            if obj._userFunctions[cond] then
+              if obj._userFunctions[cond]() then
+                fn()
+              end
+              -- return early regardless of user function result
+              return
+            end
+
+            -- then check apps
+            if isApp(cond)() then
               fn()
-              fallback = false
-              break
+              return
             end
           end
-          if fallback and value_["_"] then
+
+          -- if no conditions matched, run default action if it exists
+          if value_["_"] then
             value_["_"]()
           end
         end
