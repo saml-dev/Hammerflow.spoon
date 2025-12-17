@@ -417,28 +417,24 @@ function obj.loadFirstValidTomlFile(paths)
             -- skip default action, it is the last resort, after the loop
             if cond == "_" then goto continue end
 
-            -- check user functions first
-            if obj._userFunctions[cond] then
-              if obj._userFunctions[cond]() then
-                fn()
-              end
-              -- return early regardless of user function result
-              return
-            end
-
-            -- then check apps
-            if isApp(cond)() then
+            -- user functions take precedence over app checks. If neither
+            -- match, run no-suffix/default action if it exists
+            -- For example:
+            -- s_desk = "..." <-- runs when `desk` user function returns true
+            -- s = "..." <-- runs when user func returns false or doesn't exist, and no app called 'desk' is installed
+            if obj._userFunctions[cond] and obj._userFunctions[cond]() then
               fn()
               return
+            elseif isApp(cond)() then
+              fn()
+              return
+            elseif value_["_"] then
+              value_["_"]()
             end
-
             ::continue::
           end
 
           -- if no conditions matched, run default action if it exists
-          if value_["_"] then
-            value_["_"]()
-          end
         end
       end
     end
