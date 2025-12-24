@@ -105,15 +105,6 @@ local move = function(loc)
   return function()
     local w = hs.window.focusedWindow()
     w:move(loc)
-    -- for some reason Firefox, and therefore Zen Browser, both
-    -- animate when no other apps do, and only change size *or*
-    -- position when moved, so it has to be issued twice. 0.2 is
-    -- the shortest delay that works consistently.
-    local bid = hs.application.frontmostApplication():bundleID()
-    if bid == "app.zen-browser.zen" or bid == "org.mozilla.firefox" then
-      os.execute("sleep 0.2")
-      w:move(loc)
-    end
   end
 end
 local open = function(link)
