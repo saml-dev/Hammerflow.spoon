@@ -122,7 +122,17 @@ local things = function(link)
   return function() os.execute(string.format("open %s", link)) end
 end
 local text = function(s)
-  return function() hs.eventtap.keyStrokes(s) end
+  return function() 
+		local is_first_line = true
+		for _, line in ipairs(split(s, "\n")) do
+			if is_first_line then
+				is_first_line = false
+			else
+				hs.eventtap.keyStroke({}, "return")
+			end
+			hs.eventtap.keyStrokes(line)
+		end
+  end
 end
 local keystroke = function(keystroke)
   local mods, key = parseKeystroke(keystroke)
