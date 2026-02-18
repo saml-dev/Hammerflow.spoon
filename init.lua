@@ -128,7 +128,7 @@ local text = function(s)
 			if is_first_line then
 				is_first_line = false
 			else
-				hs.eventtap.keyStroke({}, "return")
+				hs.eventtap.keyStroke({"shift"}, "return")
 			end
 			hs.eventtap.keyStrokes(line)
 		end
