@@ -278,6 +278,17 @@ local function getActionAndLabel(s)
       local action, _ = getActionAndLabel(replaced)
       action()
     end, label
+  elseif startswith(s, "clipboard:") then
+    local remaining = postfix(s)
+    local _, label = getActionAndLabel(remaining)
+    return function()
+      local clipboardContents = hs.pasteboard.getContents() or ""
+      -- escape % in clipboard contents so gsub doesn't treat them as captures
+      local escaped = clipboardContents:gsub("%%", "%%%%")
+      local replaced = string.gsub(remaining, "{clipboard}", escaped)
+      local action, _ = getActionAndLabel(replaced)
+      action()
+    end, label
   elseif startswith(s, "shortcut:") then
     local arg = postfix(s)
     return keystroke(arg), arg

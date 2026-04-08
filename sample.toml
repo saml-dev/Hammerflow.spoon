@@ -64,6 +64,7 @@ w = "menu:File>New Window"    # select menu items (frontmost app)
 n = "menu:Safari|File>New Tab" # select menu items (specific app)
 r = "reload"                  # reserved for reloading your hammerspoon config (helpful when auto_reload is false)
 i = "input:https://google.com/search?q={input}" # capture input and insert it into any other action
+c = "clipboard:text:{clipboard}"                # insert clipboard contents into any other action
 
 
 # we have window management too!
