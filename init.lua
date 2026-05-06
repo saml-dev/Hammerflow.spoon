@@ -462,7 +462,21 @@ function obj.loadFirstValidTomlFile(paths)
   end
 
   local keys = parseKeyMap(configFile)
-  hs.hotkey.bind(leader_key_mods, leader_key, spoon.RecursiveBinder.recursiveBind(keys))
+  local bindAction = spoon.RecursiveBinder.recursiveBind(keys)
+  hs.hotkey.bind(leader_key_mods, leader_key, function()
+    if hs.eventtap.isSecureInputEnabled() then
+      hs.alert.show("⚠ Secure Input Active — hotkeys disabled", {
+        strokeColor = { white = 0, alpha = 1 },
+        fillColor = { red = 0.75, green = 0.1, blue = 0.1, alpha = 0.92 },
+        textColor = { white = 1, alpha = 1 },
+        textSize = 20,
+        radius = 8,
+        padding = 16,
+      }, hs.screen.mainScreen(), 3)
+      return
+    end
+    bindAction()
+  end)
 end
 
 function obj.registerFunctions(...)
